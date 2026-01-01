@@ -296,7 +296,7 @@ export default function App() {
                         </div>
                         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyle.bg} ${statusStyle.text}`}>{request.status}</span>
                       </div>
-                      <div className="mt-3 flex items-center justify-between text-sm text-slate-600">
+                      <div className="mt-3 grid gap-3 text-sm text-slate-600">
                         <div>
                           <p className="text-xs uppercase text-slate-400">Días</p>
                           <p className="text-base font-semibold text-slate-900">{request.days}</p>
@@ -305,7 +305,7 @@ export default function App() {
                           <p className="text-xs uppercase text-slate-400">Aprobador</p>
                           <p className="text-base font-semibold text-slate-900">{request.approver}</p>
                         </div>
-                        <div className="text-right">
+                        <div>
                           <p className="text-xs uppercase text-slate-400">Nota</p>
                           <p className="text-base font-semibold text-slate-900">{request.note}</p>
                         </div>
