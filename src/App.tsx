@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ClipboardList, Clock4, History, Menu } from "lucide-react";
+import { Button } from "./components/ui/button";
 import logoIcon from "./assets/icono_inout360.jpg";
 
 type BottomNavId = "panel" | "historial" | "tareas";
@@ -38,7 +39,48 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="mx-auto w-full max-w-md px-4 pt-44 pb-32" />
+      <main className="mx-auto w-full max-w-md px-4 pt-44 pb-32">
+        <div className="rounded-[28px] bg-white/80 p-6 text-center shadow-[0_25px_60px_rgba(8,8,20,0.15)]">
+          <p className="mb-6 text-2xl font-semibold text-slate-800">Registra tu jornada</p>
+          <Button size="lg" className="h-16 w-full rounded-[32px] text-lg">
+            Entrada / Salida
+          </Button>
+        </div>
+        <div className="mt-6 rounded-[28px] bg-white px-6 py-5 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+          <div className="flex items-center justify-between text-sm uppercase tracking-wide text-slate-500">
+            <span>Turno actual</span>
+            <span>08:00 - 16:00</span>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-slate-500">Inicio</p>
+              <p className="text-2xl font-semibold text-slate-900">08:02h</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-slate-500">Fin</p>
+              <p className="text-2xl font-semibold text-slate-900">2:30 Activo</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 rounded-[28px] bg-white px-6 py-5 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+          <div className="flex items-center justify-between text-sm uppercase tracking-wide text-slate-500">
+            <span>Semana actual</span>
+            <span>Horas</span>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-slate-500">Teóricas</p>
+              <p className="text-2xl font-semibold text-slate-900">40h 00m</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-slate-500">Realizadas</p>
+              <p className="text-2xl font-semibold text-slate-900">32h 40m</p>
+            </div>
+          </div>
+
+
+        </div>
+      </main>
 
       <nav className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white/95 px-4 py-4">
         <div className="mx-auto flex w-full max-w-md gap-2 rounded-[32px] bg-slate-50 p-2 shadow-[0_18px_35px_rgba(15,23,42,0.15)]">
