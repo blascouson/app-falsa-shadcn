@@ -1,15 +1,22 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ClipboardList, Clock4, History, Menu } from "lucide-react";
 import { Button } from "./components/ui/button";
-import { historyEntries } from "./data/mock-data";
+import { Switch } from "./components/ui/switch";
+import { companyProfile, employeeProfile, historyEntries, preferenceToggles } from "./data/mock-data";
 import logoIcon from "./assets/icono_inout360.jpg";
 
-type BottomNavId = "panel" | "historial" | "tareas";
+type BottomNavId = "panel" | "historial" | "tareas" | "perfil";
 
 type BottomNavItem = {
   id: BottomNavId;
   label: string;
   icon: typeof Clock4;
+};
+
+type MenuAction = {
+  id: string;
+  label: string;
+  targetNav?: BottomNavId;
 };
 
 const bottomNavItems: BottomNavItem[] = [
@@ -51,8 +58,51 @@ function getWeeklySummaryMinutes() {
 
 export default function App() {
   const [activeNav, setActiveNav] = useState<BottomNavId>("panel");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [preferenceState, setPreferenceState] = useState<Record<string, boolean>>(() =>
+    preferenceToggles.reduce((acc, pref) => {
+      acc[pref.id] = pref.defaultChecked;
+      return acc;
+    }, {} as Record<string, boolean>)
+  );
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const weeklySummary = getWeeklySummaryMinutes();
   const varianceLabel = weeklySummary.variance > 0 ? `+${formatDuration(weeklySummary.variance)}` : formatDuration(weeklySummary.variance);
+  const menuActions: MenuAction[] = [
+    { id: "ausencias", label: "Ausencias" },
+    { id: "perfil", label: "Perfil", targetNav: "perfil" },
+  ];
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, [isMenuOpen]);
+
+  const handleMenuAction = (action: MenuAction) => {
+    if (action.targetNav) {
+      setActiveNav(action.targetNav);
+    }
+    setIsMenuOpen(false);
+  };
+
+  const handlePreferenceChange = (id: string, checked: boolean) => {
+    setPreferenceState((prev) => ({ ...prev, [id]: checked }));
+  };
 
   return (
     <div className="min-h-screen bg-background/80">
@@ -67,9 +117,30 @@ export default function App() {
               <p className="text-xs text-slate-400">Control horario</p>
             </div>
           </div>
-          <button className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/30" aria-label="Abrir menú">
-            <Menu className="h-5 w-5" />
-          </button>
+          <div className="relative" ref={menuRef}>
+            <button
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-primary/30"
+              aria-label="Abrir menú"
+              aria-expanded={isMenuOpen}
+              aria-haspopup="menu"
+              onClick={() => setIsMenuOpen((prev) => !prev)}
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            {isMenuOpen && (
+              <div className="absolute right-0 top-14 w-48 space-y-2 rounded-2xl border border-slate-100 bg-white/95 p-2 text-left shadow-[0_18px_40px_rgba(15,23,42,0.15)]">
+                {menuActions.map((action) => (
+                  <button
+                    key={action.id}
+                    className="w-full rounded-xl bg-slate-900/5 px-3 py-2 text-center text-sm font-semibold text-slate-900 transition hover:bg-primary hover:text-white"
+                    onClick={() => handleMenuAction(action)}
+                  >
+                    {action.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -167,6 +238,98 @@ export default function App() {
           <div className="rounded-[28px] bg-white/90 p-8 text-center text-slate-600 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
             <p className="text-lg font-semibold text-slate-900">Gestión de tareas</p>
             <p className="mt-2 text-sm">Próximamente podrás seleccionar y pausar tareas desde esta vista.</p>
+          </div>
+        )}
+
+        {activeNav === "perfil" && (
+          <div className="space-y-6">
+            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <p className="text-xs uppercase tracking-wide text-slate-500">Datos de la empresa</p>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-900">{companyProfile.name}</h2>
+              <p className="text-sm text-slate-500">{companyProfile.sector}</p>
+              <dl className="mt-6 grid grid-cols-2 gap-4 text-sm text-slate-600">
+                <div>
+                  <dt className="text-xs uppercase text-slate-400">CIF</dt>
+                  <dd className="text-base font-semibold text-slate-900">{companyProfile.taxId}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase text-slate-400">Teléfono</dt>
+                  <dd className="text-base font-semibold text-slate-900">{companyProfile.contactPhone}</dd>
+                </div>
+                <div className="col-span-2">
+                  <dt className="text-xs uppercase text-slate-400">Email</dt>
+                  <dd className="text-base font-semibold text-slate-900">{companyProfile.contactEmail}</dd>
+                  <dt className="mt-4 text-xs uppercase text-slate-400">Ubicación</dt>
+                  <dd className="text-base font-semibold text-slate-900">{companyProfile.address}</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Ficha del empleado</p>
+                  <p className="mt-2 text-3xl font-semibold text-slate-900">{employeeProfile.name}</p>
+                  <p className="text-sm text-slate-500">{employeeProfile.role}</p>
+                </div>
+                <Button variant="outline" size="sm">
+                  Editar perfil
+                </Button>
+              </div>
+              <dl className="mt-6 grid grid-cols-2 gap-4 text-sm text-slate-600">
+                <div>
+                  <dt className="text-xs uppercase text-slate-400">ID empleado</dt>
+                  <dd className="text-base font-semibold text-slate-900">{employeeProfile.employeeId}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase text-slate-400">Departamento</dt>
+                  <dd className="text-base font-semibold text-slate-900">{employeeProfile.department}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase text-slate-400">Responsable</dt>
+                  <dd className="text-base font-semibold text-slate-900">{employeeProfile.manager}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase text-slate-400">Ubicación</dt>
+                  <dd className="text-base font-semibold text-slate-900">{employeeProfile.location}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase text-slate-400">Turno</dt>
+                  <dd className="text-base font-semibold text-slate-900">{employeeProfile.shift}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase text-slate-400">Antigüedad</dt>
+                  <dd className="text-base font-semibold text-slate-900">{employeeProfile.seniority}</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Personalización</p>
+                  <p className="mt-1 text-base text-slate-500">Activa o desactiva las opciones disponibles para tu jornada.</p>
+                </div>
+                <Button size="sm" variant="outline">
+                  Guardar cambios
+                </Button>
+              </div>
+              <div className="mt-4 space-y-4">
+                {preferenceToggles.map((pref) => (
+                  <div key={pref.id} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
+                    <div className="pr-3">
+                      <p className="text-sm font-semibold text-slate-900">{pref.label}</p>
+                      <p className="text-xs text-slate-500">{pref.description}</p>
+                    </div>
+                    <Switch
+                      checked={preferenceState[pref.id] ?? pref.defaultChecked}
+                      onCheckedChange={(checked) => handlePreferenceChange(pref.id, checked)}
+                      aria-label={`Cambiar ${pref.label}`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
         )}
       </main>

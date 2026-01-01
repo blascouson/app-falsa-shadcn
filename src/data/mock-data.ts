@@ -59,9 +59,9 @@ export const historyEntries = [
 ];
 
 export const preferenceToggles = [
-  { id: "geo", label: "Geolocalización obligatoria", defaultChecked: true },
-  { id: "offline", label: "Modo offline", defaultChecked: false },
-  { id: "alerts", label: "Alertas push", defaultChecked: true },
+  { id: "geo", label: "Geolocalización obligatoria", description: "Exige posición verificada al fichar", defaultChecked: true },
+  { id: "offline", label: "Modo offline", description: "Permite registrar jornadas sin cobertura", defaultChecked: false },
+  { id: "alerts", label: "Alertas push", description: "Recibe avisos de turnos y incidencias", defaultChecked: true },
 ];
 
 export const taskOptions = [
@@ -70,3 +70,23 @@ export const taskOptions = [
   "Verificación cámaras",
   "Supervisión accesos",
 ];
+
+export const companyProfile = {
+  name: "InOut360 Logistics",
+  taxId: "B-98412345",
+  address: "Av. de la Industria 25, Madrid",
+  contactEmail: "rrhh@inout360.com",
+  contactPhone: "+34 910 123 456",
+  sector: "Operaciones y logística",
+};
+
+export const employeeProfile = {
+  name: "Laura Gómez",
+  role: "Supervisora de almacén",
+  employeeId: "EMP-2045",
+  department: "Operaciones",
+  manager: "Alberto Ruiz",
+  location: "Madrid · Plataforma Central",
+  shift: "Mañana (07:00 - 15:00)",
+  seniority: "3 años en la compañía",
+};
