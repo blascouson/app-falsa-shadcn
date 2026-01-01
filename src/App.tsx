@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { ClipboardList, Clock4, History, Menu } from "lucide-react";
 import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
 import { Switch } from "./components/ui/switch";
-import { absenceBalances, absenceRequests, companyProfile, employeeProfile, historyEntries, preferenceToggles } from "./data/mock-data";
-import logoIcon from "./assets/icono_inout360.jpg";
+import { Textarea } from "./components/ui/textarea";
+import { absenceBalances, absenceRequests, companyProfile, employeeProfile, historyEntries, preferenceToggles, taskOptions } from "./data/mock-data";
+import logoIcon from "./assets/inout360.png";
 
-type BottomNavId = "panel" | "historial" | "tareas" | "perfil" | "ausencias";
+type BottomNavId = "panel" | "historial" | "tareas" | "perfil" | "ausencias" | "solicitudAusencia";
 
 type BottomNavItem = {
   id: BottomNavId;
@@ -71,6 +74,9 @@ export default function App() {
       return acc;
     }, {} as Record<string, boolean>)
   );
+  const [absenceForm, setAbsenceForm] = useState({ start: "", end: "", reason: "" });
+  const [selectedTask, setSelectedTask] = useState<string>("");
+  const [previousTask, setPreviousTask] = useState<string>("");
   const menuRef = useRef<HTMLDivElement | null>(null);
   const weeklySummary = getWeeklySummaryMinutes();
   const varianceLabel = weeklySummary.variance > 0 ? `+${formatDuration(weeklySummary.variance)}` : formatDuration(weeklySummary.variance);
@@ -110,6 +116,27 @@ export default function App() {
   const handlePreferenceChange = (id: string, checked: boolean) => {
     setPreferenceState((prev) => ({ ...prev, [id]: checked }));
   };
+
+  const handleAbsenceFormChange = (field: "start" | "end" | "reason", value: string) => {
+    setAbsenceForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAbsenceFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setActiveNav("ausencias");
+  };
+
+  const handleTaskSelect = (value: string) => {
+    setPreviousTask(selectedTask);
+    setSelectedTask(value);
+  };
+
+  const handleFinishTask = () => {
+    setSelectedTask("");
+    setPreviousTask("");
+  };
+
+  const hasTaskChanged = Boolean(previousTask && selectedTask && previousTask !== selectedTask);
 
   return (
     <div className="min-h-screen bg-background/80">
@@ -242,10 +269,43 @@ export default function App() {
         )}
 
         {activeNav === "tareas" && (
-          <div className="rounded-[28px] bg-white/90 p-8 text-center text-slate-600 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
-            <p className="text-lg font-semibold text-slate-900">Gestión de tareas</p>
-            <p className="mt-2 text-sm">Próximamente podrás seleccionar y pausar tareas desde esta vista.</p>
-          </div>
+          <section className="space-y-6 rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-slate-500">Gestión de tareas</p>
+              <h2 className="mt-2 text-2xl font-semibold">Selecciona la actividad que vas a iniciar</h2>
+              <p className="text-sm text-slate-500">Recuerda actualizarla cada vez que cambies de puesto para mantener la trazabilidad.</p>
+            </div>
+            {selectedTask && (
+              <div className="rounded-2xl bg-slate-50 px-[0] py-3 text-left text-sm text-slate-600">
+                <p className="text-left text-xs uppercase text-slate-400">Tarea actual</p>
+                <p className="text-lg font-semibold text-slate-900">{selectedTask}</p>
+              </div>
+            )}
+            {selectedTask && (
+              <div className="flex justify-end">
+                <Button variant="outline" onClick={handleFinishTask}>
+                  Finalizar tarea
+                </Button>
+              </div>
+            )}
+            <div>
+              <label htmlFor="task-picker" className="text-xs uppercase tracking-wide text-slate-500">
+                Seleccionar nueva tarea 
+              </label>
+              <Select value={selectedTask} onValueChange={handleTaskSelect}>
+                <SelectTrigger id="task-picker" className="mt-2 h-12 w-full rounded-2xl border border-slate-200 text-left">
+                  <SelectValue placeholder="Elige una tarea" />
+                </SelectTrigger>
+                <SelectContent className="w-[320px]">
+                  {taskOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </section>
         )}
 
         {activeNav === "ausencias" && (
@@ -258,7 +318,7 @@ export default function App() {
                   <p className="text-sm text-slate-500">Incluye vacaciones, asuntos propios y formación</p>
                 </div>
               </div>
-              <div className="mt-6 grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 {absenceBalances.map((balance) => (
                   <div
                     key={balance.id}
@@ -270,7 +330,7 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              <Button size="sm" className="self-end">
+              <Button size="sm" className="self-end" onClick={() => setActiveNav("solicitudAusencia")}>
                 Solicitar nueva ausencia
               </Button>
             </section>
@@ -316,6 +376,70 @@ export default function App() {
                   );
                 })}
               </div>
+            </section>
+          </div>
+        )}
+
+        {activeNav === "solicitudAusencia" && (
+          <div className="space-y-6">
+            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Nueva solicitud</p>
+                <h2 className="mt-2 text-2xl font-semibold text-slate-900">Registra tu ausencia</h2>
+                <p className="text-sm text-slate-500">Indica el rango de fechas y el motivo para enviar la petición a RRHH.</p>
+              </div>
+              <form className="mt-6 space-y-5" onSubmit={handleAbsenceFormSubmit}>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="absence-start" className="text-xs uppercase tracking-wide text-slate-500">
+                      Desde
+                    </label>
+                    <Input
+                      id="absence-start"
+                      type="date"
+                      value={absenceForm.start}
+                      onChange={(event) => handleAbsenceFormChange("start", event.target.value)}
+                      required
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="absence-end" className="text-xs uppercase tracking-wide text-slate-500">
+                      Hasta
+                    </label>
+                    <Input
+                      id="absence-end"
+                      type="date"
+                      value={absenceForm.end}
+                      onChange={(event) => handleAbsenceFormChange("end", event.target.value)}
+                      required
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="absence-reason" className="text-xs uppercase tracking-wide text-slate-500">
+                    Motivo
+                  </label>
+                  <Textarea
+                    id="absence-reason"
+                    rows={5}
+                    className="mt-2"
+                    placeholder="Describe brevemente la razón de tu ausencia"
+                    value={absenceForm.reason}
+                    onChange={(event) => handleAbsenceFormChange("reason", event.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                  <Button type="button" variant="outline" onClick={() => setActiveNav("ausencias")}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit" disabled={!absenceForm.start || !absenceForm.end || !absenceForm.reason.trim()}>
+                    Enviar solicitud
+                  </Button>
+                </div>
+              </form>
             </section>
           </div>
         )}

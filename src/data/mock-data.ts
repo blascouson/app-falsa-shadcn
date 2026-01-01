@@ -65,10 +65,10 @@ export const preferenceToggles = [
 ];
 
 export const taskOptions = [
-  "Inventario pasillo 4",
-  "Recepción camiones",
-  "Verificación cámaras",
-  "Supervisión accesos",
+  "Mostrador",
+  "Recepción pedidos",
+  "Inventario",
+  "Gestión de recetas",
 ];
 
 export const companyProfile = {
