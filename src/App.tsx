@@ -250,14 +250,13 @@ export default function App() {
 
         {activeNav === "ausencias" && (
           <div className="space-y-6">
-            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+            <section className="flex flex-col gap-6 rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-wide text-slate-500">Resumen de ausencias</p>
                   <p className="mt-2 text-3xl font-semibold text-slate-900">{totalAbsenceRemaining} días disponibles</p>
                   <p className="text-sm text-slate-500">Incluye vacaciones, asuntos propios y formación</p>
                 </div>
-                <Button size="sm">Solicitar</Button>
               </div>
               <div className="mt-6 grid grid-cols-3 gap-3">
                 {absenceBalances.map((balance) => (
@@ -271,6 +270,9 @@ export default function App() {
                   </div>
                 ))}
               </div>
+              <Button size="sm" className="self-end">
+                Solicitar nueva ausencia
+              </Button>
             </section>
 
             <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
