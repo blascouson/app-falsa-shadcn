@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { ClipboardList, Clock4, History, Menu } from "lucide-react";
 import { Button } from "./components/ui/button";
 import { Switch } from "./components/ui/switch";
-import { companyProfile, employeeProfile, historyEntries, preferenceToggles } from "./data/mock-data";
+import { absenceBalances, absenceRequests, companyProfile, employeeProfile, historyEntries, preferenceToggles } from "./data/mock-data";
 import logoIcon from "./assets/icono_inout360.jpg";
 
-type BottomNavId = "panel" | "historial" | "tareas" | "perfil";
+type BottomNavId = "panel" | "historial" | "tareas" | "perfil" | "ausencias";
 
 type BottomNavItem = {
   id: BottomNavId;
@@ -24,6 +24,12 @@ const bottomNavItems: BottomNavItem[] = [
   { id: "historial", label: "Historial", icon: History },
   { id: "tareas", label: "Tarea", icon: ClipboardList },
 ];
+
+const absenceStatusStyles: Record<string, { bg: string; text: string }> = {
+  aprobada: { bg: "bg-emerald-50", text: "text-emerald-700" },
+  pendiente: { bg: "bg-amber-50", text: "text-amber-700" },
+  rechazada: { bg: "bg-rose-50", text: "text-rose-700" },
+};
 
 const WEEKLY_TARGET_MINUTES = 40 * 60;
 
@@ -68,8 +74,9 @@ export default function App() {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const weeklySummary = getWeeklySummaryMinutes();
   const varianceLabel = weeklySummary.variance > 0 ? `+${formatDuration(weeklySummary.variance)}` : formatDuration(weeklySummary.variance);
+  const totalAbsenceRemaining = absenceBalances.reduce((sum, balance) => sum + balance.remaining, 0);
   const menuActions: MenuAction[] = [
-    { id: "ausencias", label: "Ausencias" },
+    { id: "ausencias", label: "Ausencias", targetNav: "ausencias" },
     { id: "perfil", label: "Perfil", targetNav: "perfil" },
   ];
 
@@ -238,6 +245,76 @@ export default function App() {
           <div className="rounded-[28px] bg-white/90 p-8 text-center text-slate-600 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
             <p className="text-lg font-semibold text-slate-900">Gestión de tareas</p>
             <p className="mt-2 text-sm">Próximamente podrás seleccionar y pausar tareas desde esta vista.</p>
+          </div>
+        )}
+
+        {activeNav === "ausencias" && (
+          <div className="space-y-6">
+            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Resumen de ausencias</p>
+                  <p className="mt-2 text-3xl font-semibold text-slate-900">{totalAbsenceRemaining} días disponibles</p>
+                  <p className="text-sm text-slate-500">Incluye vacaciones, asuntos propios y formación</p>
+                </div>
+                <Button size="sm">Solicitar</Button>
+              </div>
+              <div className="mt-6 grid grid-cols-3 gap-3">
+                {absenceBalances.map((balance) => (
+                  <div
+                    key={balance.id}
+                    className="grid h-[200px] grid-rows-[minmax(48px,auto)_1fr_auto] place-items-center rounded-2xl bg-slate-50 px-4 py-5 text-center"
+                  >
+                    <p className="flex w-full items-center justify-center text-center text-xs uppercase leading-tight text-slate-500">{balance.label}</p>
+                    <p className="self-center text-3xl font-semibold text-slate-900">{balance.remaining}</p>
+                    <p className="text-xs text-slate-500">de {balance.total} días</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Solicitudes recientes</p>
+                  <p className="text-sm text-slate-500">Estado y detalles de tus últimas peticiones</p>
+                </div>
+                <Button variant="outline" size="sm">
+                  Ver historial completo
+                </Button>
+              </div>
+              <div className="mt-4 space-y-4">
+                {absenceRequests.map((request) => {
+                  const styleKey = request.status.toLowerCase();
+                  const statusStyle = absenceStatusStyles[styleKey] ?? { bg: "bg-slate-100", text: "text-slate-600" };
+                  return (
+                    <div key={request.id} className="rounded-2xl border border-slate-100 bg-white/90 px-4 py-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{request.type}</p>
+                          <p className="text-xs text-slate-500">{request.dateRange}</p>
+                        </div>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyle.bg} ${statusStyle.text}`}>{request.status}</span>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between text-sm text-slate-600">
+                        <div>
+                          <p className="text-xs uppercase text-slate-400">Días</p>
+                          <p className="text-base font-semibold text-slate-900">{request.days}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase text-slate-400">Aprobador</p>
+                          <p className="text-base font-semibold text-slate-900">{request.approver}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs uppercase text-slate-400">Nota</p>
+                          <p className="text-base font-semibold text-slate-900">{request.note}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
           </div>
         )}
 

@@ -90,3 +90,39 @@ export const employeeProfile = {
   shift: "Mañana (07:00 - 15:00)",
   seniority: "3 años en la compañía",
 };
+
+export const absenceBalances = [
+  { id: "vacaciones", label: "Vacaciones", remaining: 8, total: 22 },
+  { id: "asuntos", label: "Asuntos propios", remaining: 3, total: 5 },
+  { id: "formacion", label: "Formación", remaining: 4, total: 8 },
+];
+
+export const absenceRequests = [
+  {
+    id: "SOL-24018",
+    type: "Vacaciones",
+    dateRange: "12 - 16 Feb",
+    days: 5,
+    status: "Aprobada",
+    approver: "RRHH",
+    note: "Viaje familiar",
+  },
+  {
+    id: "SOL-24009",
+    type: "Asuntos propios",
+    dateRange: "29 Ene",
+    days: 1,
+    status: "Pendiente",
+    approver: "Jefe de equipo",
+    note: "Gestión bancaria",
+  },
+  {
+    id: "SOL-23988",
+    type: "Recuperación",
+    dateRange: "18 Dic",
+    days: 0.5,
+    status: "Rechazada",
+    approver: "RRHH",
+    note: "Solapada con inventario",
+  },
+];
