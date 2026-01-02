@@ -136,12 +136,10 @@ export default function App() {
     setPreviousTask("");
   };
 
-  const hasTaskChanged = Boolean(previousTask && selectedTask && previousTask !== selectedTask);
-
   return (
     <div className="min-h-screen bg-background/80">
-      <nav className="fixed inset-x-0 top-0 z-30 border-b border-slate-100 bg-white/95 px-4 py-4 shadow-[0_18px_45px_rgba(80,64,172,0.18)] backdrop-blur">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between">
+      <nav className="fixed inset-x-0 top-0 z-30 border-b border-slate-100 bg-white/95 px-6 py-4 shadow-[0_18px_45px_rgba(80,64,172,0.18)] backdrop-blur">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="overflow-hidden rounded-2xl bg-primary/15 p-2">
               <img src={logoIcon} alt="InOut360" className="h-10 w-10 object-cover" />
@@ -178,7 +176,7 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="mx-auto w-full max-w-md px-4 pt-[100px] pb-32">
+      <main className="mx-auto w-full max-w-5xl px-6 pt-[110px] pb-36">
         {activeNav === "panel" && (
           <div className="space-y-4">
             <div className="rounded-[28px] bg-white/80 p-6 text-center shadow-[0_25px_60px_rgba(8,8,20,0.15)]">
@@ -537,8 +535,8 @@ export default function App() {
         )}
       </main>
 
-      <nav className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white/95 px-4 py-4">
-        <div className="mx-auto flex w-full max-w-md gap-2 rounded-[32px] bg-slate-50 p-2 shadow-[0_18px_35px_rgba(15,23,42,0.15)]">
+      <nav className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white/95 px-6 py-5">
+        <div className="mx-auto flex w-full max-w-5xl gap-3 rounded-[32px] bg-slate-50 p-3 shadow-[0_18px_35px_rgba(15,23,42,0.15)]">
           {bottomNavItems.map((item) => {
             const isActive = activeNav === item.id;
             return (
