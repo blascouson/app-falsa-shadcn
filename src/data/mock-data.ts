@@ -126,3 +126,83 @@ export const absenceRequests = [
     note: "Solapada con inventario",
   },
 ];
+
+export const teamStatus = [
+  {
+    id: "EMP-2045",
+    name: "Laura Gómez",
+    role: "Supervisora de almacén",
+    shift: "Mañana",
+    status: "En turno",
+    checkIn: "07:48",
+    location: "Dock A2",
+    activeTask: "Recepción pedidos",
+  },
+  {
+    id: "EMP-2098",
+    name: "Carlos Muñoz",
+    role: "Operario de expediciones",
+    shift: "Mañana",
+    status: "Pendiente de fichar",
+    checkIn: "Pendiente",
+    location: "Zona C",
+    activeTask: "",
+  },
+  {
+    id: "EMP-2104",
+    name: "Paula Rivas",
+    role: "Control de calidad",
+    shift: "Partido",
+    status: "Incidencia",
+    checkIn: "08:10",
+    location: "Célula QC",
+    activeTask: "Revisión caducidades",
+  },
+  {
+    id: "EMP-1987",
+    name: "Miguel Aroca",
+    role: "Carretillero",
+    shift: "Noche",
+    status: "Descanso",
+    checkIn: "Descanso",
+    location: "",
+    activeTask: "",
+  },
+  {
+    id: "EMP-2015",
+    name: "Sara Velasco",
+    role: "Backoffice RRHH",
+    shift: "Mañana",
+    status: "En turno",
+    checkIn: "07:55",
+    location: "Oficina 2",
+    activeTask: "Mostrador",
+  },
+];
+
+export const teamAlerts = [
+  {
+    id: "AL-9812",
+    title: "Fichaje pendiente",
+    description: "Carlos Muñoz no ha registrado su entrada y figura en turno.",
+    area: "Expediciones",
+    severity: "alta",
+    timestamp: "08:20",
+  },
+  {
+    id: "AL-9807",
+    title: "Incidencia en calidad",
+    description: "Paula Rivas reporta bloqueo por lote con temperatura fuera de rango.",
+    area: "Calidad",
+    severity: "media",
+    timestamp: "08:05",
+  },
+  {
+    id: "AL-9793",
+    title: "Permiso pendiente",
+    description: "Validar solicitud urgente de asuntos propios enviada ayer por Sara Velasco.",
+    area: "RRHH",
+    severity: "baja",
+    timestamp: "07:40",
+  },
+];

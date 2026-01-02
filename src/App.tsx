@@ -5,10 +5,20 @@ import { Input } from "./components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
 import { Switch } from "./components/ui/switch";
 import { Textarea } from "./components/ui/textarea";
-import { absenceBalances, absenceRequests, companyProfile, employeeProfile, historyEntries, preferenceToggles, taskOptions } from "./data/mock-data";
+import {
+  absenceBalances,
+  absenceRequests,
+  companyProfile,
+  employeeProfile,
+  historyEntries,
+  preferenceToggles,
+  taskOptions,
+  teamAlerts,
+  teamStatus,
+} from "./data/mock-data";
 import logoIcon from "./assets/inout360.png";
 
-type BottomNavId = "panel" | "historial" | "tareas" | "perfil" | "ausencias" | "solicitudAusencia";
+type BottomNavId = "panel" | "historial" | "tareas" | "perfil" | "ausencias" | "solicitudAusencia" | "admin";
 
 type BottomNavItem = {
   id: BottomNavId;
@@ -32,6 +42,19 @@ const absenceStatusStyles: Record<string, { bg: string; text: string }> = {
   aprobada: { bg: "bg-emerald-50", text: "text-emerald-700" },
   pendiente: { bg: "bg-amber-50", text: "text-amber-700" },
   rechazada: { bg: "bg-rose-50", text: "text-rose-700" },
+};
+
+const teamStatusBadgeStyles: Record<string, string> = {
+  "En turno": "bg-emerald-50 text-emerald-700",
+  "Pendiente de fichar": "bg-amber-50 text-amber-700",
+  Incidencia: "bg-rose-50 text-rose-700",
+  Descanso: "bg-slate-100 text-slate-600",
+};
+
+const alertSeverityStyles: Record<string, { bg: string; text: string; label: string }> = {
+  alta: { bg: "bg-rose-50", text: "text-rose-700", label: "Alta" },
+  media: { bg: "bg-amber-50", text: "text-amber-700", label: "Media" },
+  baja: { bg: "bg-blue-50", text: "text-blue-700", label: "Baja" },
 };
 
 const WEEKLY_TARGET_MINUTES = 40 * 60;
@@ -81,7 +104,12 @@ export default function App() {
   const weeklySummary = getWeeklySummaryMinutes();
   const varianceLabel = weeklySummary.variance > 0 ? `+${formatDuration(weeklySummary.variance)}` : formatDuration(weeklySummary.variance);
   const totalAbsenceRemaining = absenceBalances.reduce((sum, balance) => sum + balance.remaining, 0);
+  const onShiftMembers = teamStatus.filter((member) => member.status === "En turno").length;
+  const pendingEntries = teamStatus.filter((member) => member.status === "Pendiente de fichar").length;
+  const incidentMembers = teamStatus.filter((member) => member.status === "Incidencia").length;
+  const pendingAlerts = teamAlerts.length;
   const menuActions: MenuAction[] = [
+    { id: "admin", label: "Administrador", targetNav: "admin" },
     { id: "ausencias", label: "Ausencias", targetNav: "ausencias" },
     { id: "perfil", label: "Perfil", targetNav: "perfil" },
   ];
@@ -263,6 +291,124 @@ export default function App() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {activeNav === "admin" && (
+          <div className="space-y-6">
+            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Panel del equipo</p>
+                  <h2 className="mt-2 text-2xl font-semibold">Situación general</h2>
+                  <p className="text-sm text-slate-500">Supervisa asistencia, incidencias y alertas pendientes.</p>
+                </div>
+                <Button variant="outline" size="sm">
+                  Exportar resumen
+                </Button>
+              </div>
+              <div className="mt-6 grid gap-4 md:grid-cols-4">
+                <div className="rounded-2xl bg-slate-50 p-4">
+                  <p className="text-xs uppercase text-slate-500">En turno</p>
+                  <p className="mt-2 text-3xl font-semibold text-slate-900">{onShiftMembers}</p>
+                  <p className="text-sm text-slate-500">Operativos ahora mismo</p>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-4">
+                  <p className="text-xs uppercase text-slate-500">Pendientes</p>
+                  <p className="mt-2 text-3xl font-semibold text-amber-600">{pendingEntries}</p>
+                  <p className="text-sm text-slate-500">Sin fichar</p>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-4">
+                  <p className="text-xs uppercase text-slate-500">Incidencias</p>
+                  <p className="mt-2 text-3xl font-semibold text-rose-600">{incidentMembers}</p>
+                  <p className="text-sm text-slate-500">Bloqueos registrados</p>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-4">
+                  <p className="text-xs uppercase text-slate-500">Alertas</p>
+                  <p className="mt-2 text-3xl font-semibold text-slate-900">{pendingAlerts}</p>
+                  <p className="text-sm text-slate-500">Por revisar</p>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Mi equipo</p>
+                  <p className="text-sm text-slate-500">Detalle de asistencia y actividad en curso.</p>
+                </div>
+                <Button size="sm" variant="outline">
+                  Actualizar datos
+                </Button>
+              </div>
+              <div className="mt-6 space-y-4">
+                {teamStatus.map((member) => {
+                  const statusClasses = teamStatusBadgeStyles[member.status] ?? "bg-slate-100 text-slate-600";
+                  return (
+                    <div key={member.id} className="rounded-2xl border border-slate-100 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="text-base font-semibold text-slate-900">{member.name}</p>
+                          <p className="text-sm text-slate-500">
+                            {member.role} · {member.shift}
+                          </p>
+                        </div>
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusClasses}`}>{member.status}</span>
+                      </div>
+                      <div className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-3">
+                        <div>
+                          <p className="text-xs uppercase text-slate-400">Entrada</p>
+                          <p className="text-base font-semibold text-slate-900">{member.checkIn}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase text-slate-400">Ubicación</p>
+                          <p className="text-base font-semibold text-slate-900">{member.location || "No asignado"}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs uppercase text-slate-400">Actividad</p>
+                          <p className="text-base font-semibold text-slate-900">{member.activeTask || "Sin tarea"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="rounded-[28px] bg-white px-6 py-6 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Alertas pendientes</p>
+                  <p className="text-sm text-slate-500">Revisa las incidencias antes del cierre del turno.</p>
+                </div>
+                <Button variant="outline" size="sm">
+                  Marcar como revisadas
+                </Button>
+              </div>
+              <div className="mt-4 space-y-4">
+                {teamAlerts.map((alert) => {
+                  const severity = alertSeverityStyles[alert.severity] ?? alertSeverityStyles.baja;
+                  return (
+                    <div key={alert.id} className="rounded-2xl border border-slate-100 bg-white/90 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="text-base font-semibold text-slate-900">{alert.title}</p>
+                          <p className="text-sm text-slate-500">{alert.description}</p>
+                        </div>
+                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${severity.bg} ${severity.text}`}>
+                          Severidad {severity.label}
+                        </span>
+                      </div>
+                      <div className="mt-3 flex flex-wrap items-center justify-between text-xs uppercase tracking-wide text-slate-400">
+                        <span>{alert.area}</span>
+                        <span>{alert.timestamp}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {teamAlerts.length === 0 && <p className="text-sm text-slate-500">No hay alertas pendientes.</p>}
+            </section>
           </div>
         )}
 
