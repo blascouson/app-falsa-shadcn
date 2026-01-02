@@ -118,6 +118,10 @@ export default function App() {
   const pendingEntries = teamStatus.filter((member) => member.status === "Pendiente de fichar").length;
   const incidentMembers = teamStatus.filter((member) => member.status === "Incidencia").length;
   const pendingAlerts = teamAlerts.length;
+  const today = new Date();
+  const currentMonthRaw = today.toLocaleDateString("es-ES", { month: "long" });
+  const currentMonth = currentMonthRaw.charAt(0).toUpperCase() + currentMonthRaw.slice(1);
+  const currentYear = today.getFullYear();
   const menuActions: MenuAction[] = [
     { id: "admin", label: "Mi equipo", targetNav: "admin" },
     { id: "ausencias", label: "Ausencias", targetNav: "ausencias" },
@@ -258,6 +262,26 @@ export default function App() {
                 <div className="h-full rounded-full bg-primary" style={{ width: `${weeklySummary.progress}%` }} />
               </div>
               <p className="mt-3 text-sm text-slate-500">{weeklySummary.progress}% completado · {varianceLabel} vs plan</p>
+            </div>
+
+            <div className="rounded-[28px] bg-white px-6 py-5 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.12)]">
+              <div className="flex items-center justify-between text-sm uppercase tracking-wide text-slate-500">
+                <span>Acumulados</span>
+                
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-slate-500">Mes</p>
+                  <p className="text-2xl font-semibold text-slate-900">{currentMonth}</p>
+                  <p className="text-2xl font-semibold text-slate-900">145:00 h</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-slate-500">Año</p>
+                  <p className="text-2xl font-semibold text-slate-900">{currentYear}</p>
+                  <p className="text-2xl font-semibold text-slate-900">930:30 h</p>
+                </div>
+              </div>
+              
             </div>
           </div>
         )}
