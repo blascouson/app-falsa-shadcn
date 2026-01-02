@@ -130,18 +130,19 @@ export const absenceRequests = [
 export const teamStatus = [
   {
     id: "EMP-2045",
-    name: "Laura Gómez",
-    role: "Supervisora de almacén",
+    name: "Jorge Gómez",
+    role: "Farmacéutico adjunto",
     shift: "Mañana",
     status: "En turno",
     checkIn: "07:48",
     location: "Dock A2",
     activeTask: "Recepción pedidos",
+    avatar: "https://i.pravatar.cc/96?img=12",
   },
   {
     id: "EMP-2098",
     name: "Carlos Muñoz",
-    role: "Operario de expediciones",
+    role: "Auxiliar de farmacia",
     shift: "Mañana",
     status: "Pendiente de fichar",
     checkIn: "Pendiente",
@@ -151,17 +152,18 @@ export const teamStatus = [
   {
     id: "EMP-2104",
     name: "Paula Rivas",
-    role: "Control de calidad",
+    role: "Auxiliar de farmacia",
     shift: "Partido",
     status: "Incidencia",
     checkIn: "08:10",
     location: "Célula QC",
     activeTask: "Revisión caducidades",
+    avatar: "https://i.pravatar.cc/96?img=48",
   },
   {
     id: "EMP-1987",
     name: "Miguel Aroca",
-    role: "Carretillero",
+    role: "Auxiliar de farmacia",
     shift: "Noche",
     status: "Descanso",
     checkIn: "Descanso",
@@ -171,12 +173,13 @@ export const teamStatus = [
   {
     id: "EMP-2015",
     name: "Sara Velasco",
-    role: "Backoffice RRHH",
+    role: "Auxiliar de farmacia",
     shift: "Mañana",
     status: "En turno",
     checkIn: "07:55",
     location: "Oficina 2",
     activeTask: "Mostrador",
+    avatar: "https://i.pravatar.cc/96?img=32",
   },
 ];
 

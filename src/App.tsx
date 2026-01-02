@@ -75,6 +75,16 @@ function formatDuration(totalMinutes: number) {
   return `${sign}${hours}h ${minutes.toString().padStart(2, "0")}m`;
 }
 
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("")
+    .padEnd(2, "");
+}
+
 function getWeeklySummaryMinutes() {
   const actualMinutes = historyEntries.reduce((sum, entry) => sum + parseDurationToMinutes(entry.total), 0);
   const variance = actualMinutes - WEEKLY_TARGET_MINUTES;
@@ -109,7 +119,7 @@ export default function App() {
   const incidentMembers = teamStatus.filter((member) => member.status === "Incidencia").length;
   const pendingAlerts = teamAlerts.length;
   const menuActions: MenuAction[] = [
-    { id: "admin", label: "Administrador", targetNav: "admin" },
+    { id: "admin", label: "Mi equipo", targetNav: "admin" },
     { id: "ausencias", label: "Ausencias", targetNav: "ausencias" },
     { id: "perfil", label: "Perfil", targetNav: "perfil" },
   ];
@@ -347,11 +357,24 @@ export default function App() {
                   return (
                     <div key={member.id} className="rounded-2xl border border-slate-100 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <p className="text-base font-semibold text-slate-900">{member.name}</p>
-                          <p className="text-sm text-slate-500">
-                            {member.role} · {member.shift}
-                          </p>
+                        <div className="flex items-center gap-3">
+                          {member.avatar ? (
+                            <img
+                              src={member.avatar}
+                              alt={`Avatar de ${member.name}`}
+                              className="h-12 w-12 rounded-2xl object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-base font-semibold text-slate-600">
+                              {getInitials(member.name)}
+                            </div>
+                          )}
+                          <div>
+                            <p className="text-base font-semibold text-slate-900">{member.name}</p>
+                            <p className="text-sm text-slate-500">
+                              {member.role} · {member.shift}
+                            </p>
+                          </div>
                         </div>
                         <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusClasses}`}>{member.status}</span>
                       </div>
